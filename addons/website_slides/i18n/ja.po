@@ -1446,7 +1446,7 @@ msgstr "チャンネル招待ウィザード"
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.slide_channel_partner_view_search
 msgid "Channel Member"
-msgstr ""
+msgstr "チャネル会員"
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_slide__channel_type
@@ -3378,7 +3378,7 @@ msgstr "メンバー"
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__channel_partner_ids
 msgid "Members Information"
-msgstr ""
+msgstr "メンバ情報"
 
 #. module: website_slides
 #: model:ir.model.fields.selection,name:website_slides.selection__slide_channel__visibility__members
@@ -4009,7 +4009,7 @@ msgstr "質問 \"%s\"は1つ正解がある必要があります。"
 #: code:addons/website_slides/models/slide_question.py:0
 #, python-format
 msgid "Question \"%s\" must have 1 correct answer and at least 1 incorrect answer"
-msgstr "質問  \"%s\"は1つ正解と1つの不正解を持つ必要があります。"
+msgstr "質問  \"%s\"は1つ正解と少なくとも1つの不正解を持つ必要があります。"
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_question__question

@@ -354,7 +354,7 @@ class WebsiteSale(http.Controller):
         if category:
             url = "/shop/category/%s" % slug(category)
 
-        pager = request.website.pager(url=url, total=product_count, page=page, step=ppg, scope=7, url_args=post)
+        pager = request.website.pager(url=url, total=product_count, page=page, step=ppg, scope=5, url_args=post)
         offset = pager['offset']
         products = search_product[offset:offset + ppg]
 
@@ -714,11 +714,11 @@ class WebsiteSale(http.Controller):
             name_change = partner_su and 'name' in data and data['name'] != partner_su.name
             email_change = partner_su and 'email' in data and data['email'] != partner_su.email
 
-            # Prevent changing the partner name if invoices have been issued.
-            if name_change and not partner_su.can_edit_vat():
+            # Prevent changing the billing partner name if invoices have been issued.
+            if mode[1] == 'billing' and name_change and not partner_su.can_edit_vat():
                 error['name'] = 'error'
                 error_message.append(_(
-                    "Changing your name is not allowed once invoices have been issued for your"
+                    "Changing your name is not allowed once documents have been issued for your"
                     " account. Please contact us directly for this operation."
                 ))
 
@@ -1055,7 +1055,7 @@ class WebsiteSale(http.Controller):
             )
         return {
             'website_sale_order': order,
-            'errors': [],
+            'errors': self._get_shop_payment_errors(order),
             'partner': order.partner_invoice_id,
             'order': order,
             'payment_action_id': request.env.ref('payment.action_payment_acquirer').id,
@@ -1071,6 +1071,15 @@ class WebsiteSale(http.Controller):
             'transaction_route': f'/shop/payment/transaction/{order.id}',
             'landing_route': '/shop/payment/validate',
         }
+
+    def _get_shop_payment_errors(self, order):
+        """ Check that there is no error that should block the payment.
+
+        :param sale.order order: The sales order to pay
+        :return: A list of errors (error_title, error_message)
+        :rtype: list[tuple]
+        """
+        return []
 
     @http.route('/shop/payment', type='http', auth='public', website=True, sitemap=False)
     def shop_payment(self, **post):
@@ -1130,6 +1139,12 @@ class WebsiteSale(http.Controller):
         else:
             order = request.env['sale.order'].sudo().browse(sale_order_id)
             assert order.id == request.session.get('sale_last_order_id')
+
+        errors = self._get_shop_payment_errors(order)
+        if errors:
+            first_error = errors[0]  # only display first error
+            error_msg = f"{first_error[0]}\n{first_error[1]}"
+            raise ValidationError(error_msg)
 
         if transaction_id:
             tx = request.env['payment.transaction'].sudo().browse(transaction_id)
